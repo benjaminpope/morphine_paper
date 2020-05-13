@@ -323,6 +323,30 @@ We calculate the singular values of this matrix (restricted to the support of th
 
 We have also repeated the above calculations for light with a $20\%$ fractional bandwidth\footnote{\href{https://github.com/benjaminpope/morphine/blob/master/notebooks/morphine_u,v_broadband.ipynb}{github.com/benjaminpope/morphine/blob/master/notebooks/morphine\_u,v\_broadband.ipynb}}, with a uniform spectrum sampled ten times from $1.8\,\mu\text{m}$\,---\,$2.2\,\mu\text{m}$. The results are very similar, except that the Jacobian maps equivalent to Figure~\ref{kernel_jacobian} are slightly blurred. The number of singular values (shown in green in Figure~\ref{fig:svd}) differs from the monochromatic case because the $u,v$ support is slightly changed in the broadband case, but overall a qualitatively similar behaviour is found between the broadband and monochromatic cases. 
 
+\subsection{$\alpha$~Ophiuchi}
+\label{sec:palomar}
+
+We now apply the new kernel phase formalism to real data: the A-star $\alpha$~Ophiuchi. It was observed with the Palomar~200-Inch telescope, using the extreme adaptive optics system PALM-3K and the PHARO camera. These data were first analyzed by \citet{palomar}, but \citet{martinache20} showed that there was an error in the pupil model used for the original analysis: the pupil was in fact rotated 2 degrees. Using a more accurate pupil model and the updated `xara' kernel phase code, \citet{martinache20} obtained astrometry of separation $\rho = 123.5 \pm 2.9$~mas, position angle $\theta = 86.5 \pm 0.2$~degrees, and contrast $c = 25.1 \pm 1.1$. We therefore seek to recreate this new analysis using autodiff.
+
+We first build a high resolution model of the PHARO pupil using the same code as \citet{martinache20}, and bin it down to a $64\times64$ pixel grid so that pixel values $\in [0,1]$ indicate the fraction of the telescope aperture filling that binned pixel. We then propagate this onto a $64\times64$-pixel image plane, and use a matrix Fourier transform to map this onto a $u,v$ plane of the same size. We differentiate this using the forwards mode autodiff as above, obtaining the Jacobian shown in Figure~\ref{pharo_jacobian}, and calculate a kernel phase transfer matrix.
+
+\begin{figure}
+\plotone{pharo_jacobian.pdf}
+\caption{A representation of the Jacobian determined by \textsc{jax} for the PHARO pupil in $K$-band. In each pair of images, on the left is the support of the optical transfer function (OTF), with a red dot highlighting the selected baseline; on the right is a map of the corresponding baseline's derivative with respect to phase over the pupil. We see the same maps as in Figure~1 of \citet{martinache10}. \label{pharo_jacobian}}
+\end{figure}
+
+We then extract kernel phases from both $\alpha$~Oph and a point source calibrator $\eps$~Her using a version of \textsc{xara} modified to use the \textsc{morphine} matrix FT in place of its own. Following \citet{martinache20}, we choose as our observables the median kernel phases across all 100 exposures for each, and the standard error of the mean as our base uncertainty on each. To calibrate the kernel phases, we simply subtract those of the calibrator from $\alpha$~Oph and add their uncertainties in quadrature. 
+
+To see the effect of the `ghost' introduced by the neutral density filter used to observe such bright stars, we calculate kernel phase `colinearity' maps as in \citet{martinache20}, shon in Figure~\ref{colinearity}. 
+
+\begin{figure}
+\plotone{colinearity.pdf}
+\caption{A representation of the Jacobian determined by \textsc{jax} for the PHARO pupil in $K$-band. In each pair of images, on the left is the support of the optical transfer function (OTF), with a red dot highlighting the selected baseline; on the right is a map of the corresponding baseline's derivative with respect to phase over the pupil. We see the same maps as in Figure~1 of \citet{martinache10}. \label{pharo_jacobian}}
+\end{figure}
+
+
+The contrast ratio of the system is expected from resolved imaging to be $28.0 \pm 8.3$ in $K$-band \citep{hinkley11}. 
+
 \subsection{Coronagraphy}
 \label{sec:coronagraph}
 
