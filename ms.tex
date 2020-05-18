@@ -337,15 +337,21 @@ We first build a high resolution model of the PHARO pupil using the same code as
 
 We then extract kernel phases from both $\alpha$~Oph and a point source calibrator $\eps$~Her using a version of \textsc{xara} modified to use the \textsc{morphine} matrix FT in place of its own. Following \citet{martinache20}, we choose as our observables the median kernel phases across all 100 exposures for each, and the standard error of the mean as our base uncertainty on each. To calibrate the kernel phases, we simply subtract those of the calibrator from $\alpha$~Oph and add their uncertainties in quadrature. 
 
-To see the effect of the `ghost' introduced by the neutral density filter used to observe such bright stars, we calculate kernel phase `colinearity' maps as in \citet{martinache20}, shown in Figure~\ref{colinearity}. 
+To see the effect of the `ghost' introduced by the neutral density filter used to observe such bright stars, we calculate kernel phase `colinearity' maps as in \citet{martinache20}, shown in Figure~\ref{colinearity}. In these maps we can see that the filter ghost shows up strongly as a false binary in the uncalibrated kernel phase maps, but calibrated kernel phases easily remove this and reveal the tight $\alpha$~Oph binary.
+
 
 \begin{figure}
-\plotone{colinearity.pdf}
-\caption{A representation of the Jacobian determined by \textsc{jax} for the PHARO pupil in $K$-band. In each pair of images, on the left is the support of the optical transfer function (OTF), with a red dot highlighting the selected baseline; on the right is a map of the corresponding baseline's derivative with respect to phase over the pupil. We see the same maps as in Figure~1 of \citet{martinache10}. \label{pharo_jacobian}}
+\plotone{colinearity_alphaoph.pdf}
+\caption{Kernel phase colinearity maps showing the match of a binary model (pale is a better match) to the kernel phase signals from uncalibrated $\alpha$~Oph data (left), the calibrator $\eps$~Her (middle), and calibrated data (right). They closely resemble the maps in Figure~8 of \citet{martinache20}. We can see that in uncalibrated data the filter ghost is clearly visible, but in calibrated data we extract the $\alpha$~Oph binary with no effect from the ghost. \label{colinearity}}
 \end{figure}
 
+We then use Markov Chain Monte Carlo \citep{metropolis53} to sample from the posterior assuming Gaussian likelihoods, using the \texttt{emcee} affine-invariant ensemble sampler \citep{emcee}. We obtain binary parameters of separation $\rho = 115.3 \pm 1.1$~mas, position angle $\theta = 85.7 \pm 0.25$~degrees, and contrast $c = 25.4 \pm 0.5$: these are close to the \citet{martinache20} figures, but differ by much more than their small uncertainties. For comparison, the contrast ratio of the system is expected from resolved imaging to be $28.0 \pm 8.3$ in $K$-band \citep{hinkley11}. 
 
-The contrast ratio of the system is expected from resolved imaging to be $28.0 \pm 8.3$ in $K$-band \citep{hinkley11}. 
+\begin{figure}
+\plotone{comparison_posterior.pdf}
+\caption{Posterior distributions for the binary parameters of $\alpha$~Ophiuchi as determined by the autodiff pipeline (black) and the \citet{martinache20} implementation (blue). Corner plots produced by \texttt{corner.py} \citep{corner}. \label{colinearity}}
+\end{figure}
+
 
 \subsection{Coronagraphy}
 \label{sec:coronagraph}
@@ -435,12 +441,15 @@ In the interests of open science, we have made available the Python package \tex
 \section{Conclusions}
 \label{sec:conclusions}
 
-In this paper we have treated only the monochromatic case. It is nevertheless straightforward to include broadband effects as a linear combination of diffraction simulations, which are also differentiable. Likewise, linear mixing of polarization states via Mueller matrices is easily adapted in this framework. This may be important for high angular resolution differential-polarimetry instruments such as SPHERE/ZIMPOL \citep{zimpol} on the VLT, VAMPIRES on the Subaru SCExAO \citep{vampires}, or the GPI polarimeter \citep{gpipol}, where polarization measurements are intrinsic to the goal of the experiment, or to issues with polarization leakage affecting closure phases in holographic aperture masking experiments \citep[e.g.][]{doelman18}.
+In this paper we have treated mainly the monochromatic case. It is nevertheless straightforward to include broadband effects as a linear combination of diffraction simulations, which are also differentiable. Likewise, linear mixing of polarization states via Mueller matrices is easily adapted in this framework. This may be important for high angular resolution differential-polarimetry instruments such as SPHERE/ZIMPOL \citep{zimpol} on the VLT, VAMPIRES on the Subaru SCExAO \citep{vampires}, or the GPI polarimeter \citep{gpipol}, where polarization measurements are intrinsic to the goal of the experiment, or to issues with polarization leakage affecting closure phases in holographic aperture masking experiments \citep[e.g.][]{doelman18}.
 
 % wavefront control using the nonsingular space
 In high contrast imaging with adaptive optics, a major issue of residual aberration comes from the differing optical paths between the deformable mirror and on the one hand the wavefront sensor, and on the other the science camera. Non-common-path aberrations in this part of the optical system cannot be sensed and corrected inside the AO loop alone. Slowly-evolving non-common path errors cause quasi-static speckles that are one of the key sources of noise limiting the sensitivity of high-contrast instruments to exoplanets. As noted by \citet{martinache13}, the space complementary to kernel phases, which are affected directly by phase noise, can be used for focal-plane wavefront sensing. This has the advantage of avoiding non-common path errors between the wavefront sensor and the science instrument. For a simple aperture, so long as the pupil is not symmetric with respect to inversion around its centre, all pupil phase information is encoded in the PSF and can be recovered reasonably accurately with a Moore-Penrose pseudoinverse of the phase transfer matrix \citep{moore1920,bjerhammar1951,penrose_1955}. This can be made even more effective with an integral field spectrograph, as spectrally-dispersed PSFs encode a hologram of the input wavefront \citep{martinache16}. The asymmetric pupil linear phase transfer approach has been used for focal-plane wavefront sensing in the lab \citep[e.g.][]{pope14,swift} and on Subaru SCExAO \citep{martinache16b}. Extending the domain of applicability of the linear phase transfer paradigm to coronagraphs using autodiff may allow for new approaches to focal plane wavefront sensing. 
 
 The approach of \citet{sitzmann2018} to end-to-end optimization of an optical system has clear relevance to optical astronomy. Going beyond using gradients for phase retrieval \citep{jurling14}, we can envision gradient-based \textit{phase design} for coronagraphs and for diffractive-pupil telescopes. For example, it may be useful in rapidly finding deformable mirror settings to generate a ``dark hole'' in high-contrast imaging \citep{malbet95}. It may also be useful for diffractive-pupil design: the \textsc{Toliman} space telescope concept \citep{tuthill18,bendek18} aims to use a pupil-plane phase mask to achieve high precision relative astrometry of $\alpha$~Centauri AB to search for exoplanets. Work so far in designing the phase mask has been in optimizing parametrized pupils with respect to the radially-weighted gradient energy of the PSF as a proxy for astrometric precision. It will be in principle possible to calculate the Fisher information for the astrometric precision, and to use this as an objective function for optimizing a non-parametric \textsc{Toliman} pupil. By differentiating with respect to phase in intermediate planes, \textsc{morphine}-like methods will also be useful in intermediate-plane wavefront control and mask design.
+
+%outside of astronomy
+The generalization of kernel phase and optical gradient design permitted by autodiff also allows us to extend this work to the near-field (Fresnel) propagation regime. This may lead to improvements in modelling of components (such as deformable mirrors) that might occur in planes intermediate between pupil and focus. This may be most relevant outside of astronomy: for example, Fresnel coherent diffractive imaging \citep{williams2006} is a popular microscopy technique, in which gradient-based advances in phase retrieval, kernel phase and optimization may be valuable.
 
 \section*{Acknowledgements} % add your acknowledgements text here!
 
@@ -452,7 +461,7 @@ This research made use of NASA's Astrophysics Data System.
 
 BJSP acknowledges being on the traditional territory of the Lenape Nations and recognizes that Manhattan continues to be the home to many Algonkian peoples. We give blessings and thanks to the Lenape people and Lenape Nations in recognition that we are carrying out this work on their indigenous homelands.
 %
-\software{This research made use of \textsc{jax} \citep{jax}; \textsc{poppy}, an open-source optical propagation Python package originally developed for the James Webb Space Telescope project \citep{poppy}; the \textsc{IPython} package \citep{ipython}; \textsc{NumPy} \citep{numpy}; \textsc{matplotlib} \citep{matplotlib} \textsc{SciPy} \citep{scipy}; and Astropy, a community-developed core Python package for Astronomy \citep{astropy}.}
+\software{This research made use of \textsc{jax} \citep{jax}; \textsc{poppy}, an open-source optical propagation Python package originally developed for the James Webb Space Telescope project \citep{poppy}; the \textsc{IPython} package \citep{ipython}; \textsc{NumPy} \citep{numpy}; \textsc{matplotlib} \citep{matplotlib} \textsc{SciPy} \citep{scipy}; \texttt{emcee} \citep{emcee} and \texttt{corner.py} \citep{corner}; and Astropy, a community-developed core Python package for Astronomy \citep{astropy}.}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
