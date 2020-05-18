@@ -345,13 +345,14 @@ To see the effect of the `ghost' introduced by the neutral density filter used t
 \caption{Kernel phase colinearity maps showing the match of a binary model (pale is a better match) to the kernel phase signals from uncalibrated $\alpha$~Oph data (left), the calibrator $\eps$~Her (middle), and calibrated data (right). They closely resemble the maps in Figure~8 of \citet{martinache20}. We can see that in uncalibrated data the filter ghost is clearly visible, but in calibrated data we extract the $\alpha$~Oph binary with no effect from the ghost. \label{colinearity}}
 \end{figure}
 
-We then use Markov Chain Monte Carlo \citep{metropolis53} to sample from the posterior assuming Gaussian likelihoods, using the \texttt{emcee} affine-invariant ensemble sampler \citep{emcee}. We obtain binary parameters of separation $\rho = 115.3 \pm 1.1$~mas, position angle $\theta = 85.7 \pm 0.25$~degrees, and contrast $c = 25.4 \pm 0.5$: these are close to the \citet{martinache20} figures, but differ by much more than their small uncertainties. For comparison, the contrast ratio of the system is expected from resolved imaging to be $28.0 \pm 8.3$ in $K$-band \citep{hinkley11}. 
+We then use Markov Chain Monte Carlo \citep{metropolis53} to sample from the posterior assuming Gaussian likelihoods, using the \texttt{emcee} affine-invariant ensemble sampler \citep{emcee}. We obtain binary parameters of separation $\rho = 115.3 \pm 1.2$~mas, position angle $\theta = 85.6 \pm 0.27$~degrees, and contrast $c = 26.3 \pm 0.6$: these are close to the \citet{martinache20} figures, but differ by much more than their small uncertainties. For comparison, the contrast ratio of the system is expected from resolved imaging to be $28.0 \pm 8.3$ in $K$-band \citep{hinkley11}. 
 
 \begin{figure}
 \plotone{comparison_posterior.pdf}
 \caption{Posterior distributions for the binary parameters of $\alpha$~Ophiuchi as determined by the autodiff pipeline (black) and the \citet{martinache20} implementation (blue). Corner plots produced by \texttt{corner.py} \citep{corner}. \label{colinearity}}
 \end{figure}
 
+In order to investigate this discrepancy, we generated a grid of forwards models 
 
 \subsection{Coronagraphy}
 \label{sec:coronagraph}
