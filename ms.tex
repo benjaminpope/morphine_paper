@@ -381,17 +381,23 @@ In numerical experiments, subpixel mismatch in Fourier transform coordinates or 
 \subsection{Coronagraphy}
 \label{sec:coronagraph}
 
-We now consider a very simple Lyot coronagraph \citep{lyot30}, using \textsc{morphine}. We choose a 1\,$\mu$m wavelength, and 1\,m diameter pupil sampled on a $64\times64$ grid. The central $4 \lambda/D$ region of the resulting PSF is blocked out with a focal plane stop, and the light is then propagated to a second pupil plane using an FFT rather than a matrix FT, following standard \textsc{poppy} practice; this imposes tougher memory constraints, and in future may be replaced with an MFT. A Lyot stop (a pupil mask undersized 10\% relative to the input pupil) is then imposed, and the light is propagated to a final focal plane sampled on a 50\,mas pixel scale grid with a 4~arcsec field of view. Aside from the coarse gridding, this is intentionally identical to one of the standard example pieces for \textsc{poppy}\footnote{\href{https://github.com/mperrin/poppy/blob/master/notebooks/MatrixFTCoronagraph_demo.ipynb}{github.com/mperrin/poppy/blob/master/notebooks/MatrixFTCoronagraph\_demo.ipynb}}, for the sake of consistency. The PSF produced has a dark coronagraphic hole in the middle, and beyond an inner working angle around this hole has a nearly normal Airy pattern of diffraction rings.
+We now consider a very simple Lyot coronagraph \citep{lyot30}, using \textsc{morphine}. We choose a 1\,$\mu$m wavelength, and 1\,m diameter pupil sampled on a $96\times96$ grid. The central $4 \lambda/D$ region of the resulting PSF is blocked out with a focal plane stop, and the light is then propagated to a second pupil plane using an FFT rather than a matrix FT, following standard \textsc{poppy} practice; this imposes tougher memory constraints, and in future may be replaced with an MFT. A Lyot stop (an iris mask undersized 10\% relative to the input pupil) is then imposed, and the light is propagated to a final focal plane sampled on a 50\,mas pixel scale grid with a 4~arcsec field of view. Aside from the coarse gridding, this is intentionally identical to one of the standard example pieces for \textsc{poppy}\footnote{\href{https://github.com/mperrin/poppy/blob/master/notebooks/MatrixFTCoronagraph_demo.ipynb}{github.com/mperrin/poppy/blob/master/notebooks/MatrixFTCoronagraph\_demo.ipynb}}, for the sake of consistency. The PSF produced has a dark coronagraphic hole in the middle, and beyond an inner working angle around this hole has a nearly normal Airy pattern of diffraction rings.
 
 Again using \textsc{jax}, we calculate the Jacobian of this PSF with respect to the input wavefront, evaluated at uniform-zero phase, which again takes a few minutes on a laptop. The previous approach has been to directly propagate through the end to end simulation for a grid of small perturbations in the input plane \citep{falco}, whereas this is now taken care of by autodiff. The results are displayed in Figure~\ref{speckle_jacobian} in a similar format to Figure~\ref{kernel_jacobian}. Pixels far out in the PSF correspond to sinusoidal modulation of the input wavefront exactly as expected, and this is symmetric about the origin. On the other hand, pixels near the inner working angle where the effects of the coronagraph are evident correspond to interestingly-shaped modes in the pupil, and contain contributions from the part of the primary pupil that is obscured by the Lyot stop when the pupil is re-imaged. 
 
-Calculating the SVD of this Jacobian (again restricted to the support of the primary pupil) we se that unlike in the case of the simple diffraction, there is not a sharp cliff but instead a rolling-off which nevertheless reaches very small singular values. The singular value curve is displayed in Figure~\ref{fig:svd} in orange. 
+Calculating the SVD of this Jacobian (again restricted to the support of the primary pupil) we se that unlike in the case of the simple diffraction, there is not a sharp cliff but instead a rolling-off which nevertheless reaches very small singular values. The singular value curve is displayed in Figure~\ref{fig:svd_coronagraph}. 
 
 \begin{figure}
 \plotone{speckle_jacobian.pdf}
 \caption{A representation of the Jacobian determined by \textsc{jax} for a simple Lyot coronagraph. In each pair of images, on the left is the speckle pattern, with a red dot highlighting the selected pixel; on the right is a map of the corresponding pixel's derivative with respect to phase over the pupil. Speckles far from the central dark hole correspond simply to sinusoids across the pupil, while speckles near the inner working angle correspond to more complicated patterns. \label{speckle_jacobian}}
 \end{figure}
 
+
+\begin{figure}
+    \plotone{corona_singular.pdf}
+     \caption{Log-scale plot of the singular values of the phase transfer matrix versus index for the coronagraph simulation in Section~\ref{sec:coronagraph}. Singular values are normalized to the first singular value.}
+    \label{fig:svd_coronagraph}
+\end{figure}
 
 \begin{figure}
 \plotone{nonsingular_modes_corona.pdf}
