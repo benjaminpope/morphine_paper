@@ -363,6 +363,23 @@ In order to investigate this discrepancy, we generated a grid of forwards models
 \caption{Comparison of \citet[][blue stars]{martinache20} and autodiff (orange dots) kernel phase pipelines on simulated data, as a function of input contrast (left) and separation (right). When inspected, the samples with worse separation error after both pipelines are those at higher contrasts. Uncertainties are omitted for clarity, and because they are poorly defined in this context. \label{method_comparison_ensemble}}
 \end{figure}
 
+\begin{figure}
+\plotone{comparison_posterior_sim.pdf}
+\caption{Comparison of \citet[][blue stars]{martinache20} and autodiff (orange dots) kernel phase pipelines on simulated data with true parameters $\rho = 125$~mas, $\theta = 86^\circ$, $c=25$. We generate a cube of 1000 mock datasets using a 64-pix pupil model, and the observables used are the median and standard error of the mean of each kernel phase across this ensemble. Both datasets retrieve the true parameters very precisely, though with small systematic offsets, which are slightly larger for the autodiff method than for classic kernel phases. \label{method_comparison_ensemble}}
+\end{figure}
+
+
+\begin{figure}
+\plotone{comparison_posterior_sim.pdf}
+\caption{Comparison of \citet[][blue stars]{martinache20} and autodiff (orange dots) kernel phase pipelines on simulated data with true parameters $\rho = 125$~mas, $\theta = 86^\circ$, $c=25$. We generate a cube of 1000 mock datasets using a 64-pix pupil model, and the observables used are the median and standard error of the mean of each kernel phase across this ensemble. Both methods retrieve the true parameters very precisely, though with small systematic offsets, which are slightly larger for the autodiff method than for classic kernel phases. \label{method_comparison_ensemble}}
+\end{figure}
+
+
+\begin{figure}
+\plotone{comparison_posterior_sim_cube.pdf}
+\caption{Comparison of \citet[][blue stars]{martinache20} and autodiff (orange dots) kernel phase pipelines on simulated data with true parameters $\rho = 125$~mas, $\theta = 86^\circ$, $c=25$. We generate a cube of 1000 mock datasets using a 64-pix pupil model and Zernike aberrations as described in Section~\ref{sec:palomar}. The corner plot displays the parameters retrieved using a simple least squares fit applied to each individual frame. The methods have very similar distributions centred tightly on the true value, though there are more outliers in the autodiff implementation. \label{method_comparison_ensemble}}
+\end{figure}
+
 In numerical experiments, subpixel mismatch in Fourier transform coordinates or even Fourier centering convention could cause mismatches between simulation paramet and retrievals at around the scale of the mismatch between the two methods.  These results are in line with the \citet{martinache_habilitation} conclusion that inexact Fourier sampling contributes significant systematic noise to kernel phases.The final version used for the autodiff pipeline uses the exact optical model used to generate the data, and a differentiable version of the exact $u,v$ transform implementation used in \textsc{xara}; we do not believe this to be the main cause of the small discrepancy between autodiff and conventional parameters, but it does illustrate that model mis-specification may be a contributing factor.
 
 \subsection{Coronagraphy}
